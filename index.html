@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Global site tag (gtag.js) - Google Analytics
+    <script async="" src="assets/img/js"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-172325941-3');
+    </script> -->
+
+    <!-- <meta charset="utf-8"> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Hierarchical Few-Shot Generative Models</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro">
+    <link rel="stylesheet" href="assets/css/Highlight-Clean.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/Team-Clean.css">
+</head>
+
+<body data-new-gr-c-s-check-loaded="14.1012.0" data-gr-ext-installed="">
+    <div class="highlight-clean" style="padding-bottom: 10px;">
+        <div class="container">
+            <h1 class="text-center">Hierarchical Few-Shot Generative Models</h1>
+        </div>
+        <div class="container" style="max-width: 400px;">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5 class="text-center" style="margin: 0px;">
+                        <a class="text-center" href="https://georgosgeorgos.github.io/" target="_blank">Giorgio Giannone</a></h5>
+                    <h6 class="text-center"></h6>
+                </div>
+                <div class="col-md-6">
+                    <h5 class="text-center" style="margin: 0px;"><a href="https://olewinther.github.io/" target="_blank">Ole Winther</a></h5>
+                    <h6 class="text-center"></h6>
+                </div>
+                <!-- <div class="col-md-4">
+                    <h5 class="text-center" style="margin: 0px;"><a class="text-center" href=""></a></h5>
+                    <h6 class="text-center"></h6>
+                </div> -->
+                <!-- <div class="col-md-4">
+                    <h5 class="text-center" style="margin: 0px;"><a href=""></a></h5>
+                    <h6 class="text-center"></h6>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="text-center" style="margin: 0px;"><a class="text-center" href=""></a></h5>
+                    <h6 class="text-center"></h6>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="text-center" style="margin: 0px;"><a class="text-center" href=""></a></h5>
+                    <h6 class="text-center"></h6>
+                </div> -->
+            </div>
+        </div>
+        <div class="buttons" style="margin-bottom: 8px;">
+            <a class="btn btn-light" role="button" href="">Paper</a>
+            <a class="btn btn-light" role="button" href="https://github.com/georgosgeorgos/hierarchical-few-shot-generative-models" target="_blank">GitHub</a></div>
+        <!-- <div class="container" style="max-width: 540px;">
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <img src="assets/img/ns_gm.png" style="width: 100%;margin-bottom: 8px;" alt="Graphical model for a Neural Statistician."><em></em>
+                </div> -->
+                <!-- <div class="col-md-12 text-center">
+                    <img src="assets/img/hfsgm_gm_white.png" style="width: 100%;margin-bottom: 8px;" alt="Graphical model for Hierarchical Few-Shot Generative Models.">
+                    <em>Generative and Inference Models for a Hierarchical Few-Shot Generative Model.</em>
+                </div>
+            </div> -->
+        </div>
+    </div>
+    <!-- <hr style="max-width: 540px;"> -->
+    <!-- <div class="container" style="max-width: 540px;">
+        <div class="row">
+            <div class="col-md-12">
+                <img src="assets/img/test_v1_q.gif" style="width: 100%;margin-bottom: 8px;" alt="Graphical model for a Neural Statistician."><em></em>
+            </div>  
+        </div>
+    </div> -->
+    <hr style="max-width: 540px;">
+    <div class="container" style="max-width: 540px;">
+        <div class="row">
+            <div class="col-md-12">
+                <h2>Summary</h2>
+                <ul>
+                    <li>Generalize the <a href="https://arxiv.org/abs/1606.02185" target="_blank">Neural Statistician</a> 
+                        to a full hierarchical model with learnable aggregation.</li>
+                    <li>Quantitative evaluation of generative capacities, adaptation-free transfer and generalization.</li>
+                    <li>Iterative, conditional and unconditional sampling strategies.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <hr style="max-width: 540px;">
+    <div class="container" style="max-width: 540px;">
+        <div class="row">
+            <div class="col-md-6 text-center">
+                <img src="assets/img/ns_gm.png" style="width: 100%;margin-bottom: 8px;" alt="Graphical model for Hierarchical Few-Shot Generative Models."><em>Generative and Inference Models for a Neural Statistician.</em>
+            </div>
+            <div class="col-md-6 text-center">
+                <img src="assets/img/hfsgm_gm_white.png" style="width: 100%;margin-bottom: 8px;" alt="Graphical model for Hierarchical Few-Shot Generative Models."><em>Generative and Inference Models for a Hierarchical Few-Shot Generative Model.</em>
+            </div>
+        </div>
+    </div>
+    <hr style="max-width: 540px;">
+    <div class="container" style="max-width: 540px;">
+        <div class="row">
+            <div class="col-md-12">
+                <h2>Abstract</h2>
+                <p>A few-shot generative model should be able to generate data from a distribution by only observing a limited set of examples. 
+                    In few-shot learning the model is trained on data from many sets from different distributions sharing some underlying properties such as sets of characters from different alphabets or sets of images of different type objects. 
+                    We study a latent variables approach that extends the <a href="https://arxiv.org/abs/1606.02185" target="_blank">Neural Statistician</a> to a fully hierarchical approach with an attention-based point to set-level aggregation. 
+                    We extend the previous work to iterative data sampling, likelihood-based model comparison, and adaptation-free out of distribution generalization. 
+                    Our results show that the hierarchical formulation better captures the intrinsic variability within the sets in the small data regime.
+                    With this work we generalize deep latent variable approaches to few-shot learning, taking a step towards large-scale few-shot generation with a formulation that readily can work with current state-of-the-art deep generative models.
+                    <!-- A few-shot generative model should be able to generate data from a distribution from only observing 
+                    a limited set of examples from the distribution. In the few-shot learning set-up the model is trained 
+                    on data from many sets from different distributions sharing some underlying properties such as sets of characters 
+                    from different alphabets or sets of images of different type objects. We study a latent variables approach that extends 
+                    the <a href="https://arxiv.org/abs/1606.02185" target="_blank">Neural Statistician</a> to a fully hierarchical approach with an attention-based data point to set level latent aggregation. 
+                    We also extend the previous work to iterative data sampling and likelihood based model comparison. 
+                    We study adaptation-free out of distribution generation and generalization. 
+                    Our results show that the hierarchical formulation is better at capturing the intrinsic variability within the set. 
+                    With this work we aim to generalize deep latent variable approaches to few-shot learning, taking a step towards 
+                    large scale few-shot generation with a formulation that readily can work with current state of the art deep generative models.<br> -->
+                </p>
+            </div>
+        </div>
+    </div>
+    <hr style="max-width: 540px;">
+    <div class="container" style="max-width: 540px;">
+        <div class="row">
+                <h2>Learnable Aggregation</h2>
+                <p> Sample formation in a Convolutional Neural Statistician with learnable aggregation. 
+                    For each sample (black background) we plot the attention bars over the input sets (in white background) for four different heads.
+                </p>
+                <div class="col-md-6">
+                    <img class="img-fluid" src="assets/img/attention-20210418-144025-ctns-0.png" style="margin-bottom: 8px;">
+                    <em class="text-center" style="display: block;"></em>
+                </div>
+                <div class="col-md-6">
+                    <img class="img-fluid" src="assets/img/algo_lag.png" style="margin-bottom: 8px;">
+                    <em class="text-center" style="display: block;"></em>
+                </div>
+        </div>
+    </div>
+    <hr style="max-width: 540px;">
+    <div class="container" style="max-width: 540px;">
+        <div class="row">
+            <div class="col-md-12">
+                <h2>Generative Metrics</h2>
+                <p>Generalization on disjoint Omniglot classes. 
+                    Models trained on set size 5 and results for 
+                   a VAE, NSs with mean/max/learnable aggregation (MEAN/MAX/LAG) 
+                   convolutional variants (C)
+                   and for a HFSGM with a hierarchy over c.
+                </p>
+                <img class="img-fluid" src="assets/img/table_generative.png" style="margin-bottom: 8px;">
+                <em class="text-center" style="display: block;"></em>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <p></p>
+                <img class="img-fluid" src="assets/img/vlb_set_size_omni.png" style="margin-bottom: 8px;">
+                <em class="text-center" style="display: block;">
+                    Lower-bounds for models trained with input set size 5 varying the test set cardinality from 1 to 20 on Omniglot.
+                </em>
+            </div>
+            <div class="col-md-4">
+                <p></p>
+                <img class="img-fluid" src="assets/img/vlb_2510.png" style="margin-bottom: 8px;">
+                <em class="text-center" style="display: block;">
+                    Lower-bounds for models trained with varying input set size (2, 5, 10).
+                </em>
+            </div>
+            <div class="col-md-4">
+                <p></p>
+                <img class="img-fluid" src="assets/img/vlb_set_size_celeba.png" style="margin-bottom: 8px;">
+                <em class="text-center" style="display: block;">
+                    Lower-bounds for models trained with input set size 5 varying the test set cardinality from 1 to 20 on CelebA.
+                </em>
+            </div>
+        </div>
+    </div>
+    <hr style="max-width: 540px;">
+    <div class="container" style="max-width: 540px;">
+        <div class="row">
+            <div class="col-md-12">
+                <h2>Transfer</h2>
+                <p>
+                    Models trained on Omniglot with set size 5 and tested on MNIST, DOUBLE-MNIST and TRIPLE-MNIST 
+                    (from left to right) with different set size. 
+                    Models with learnable aggregation (LAG) can adapt better to the new datasets. 
+                </p>
+                <img class="img-fluid" src="assets/img/table_transfer.png" style="margin-bottom: 8px;"><em class="text-center" style="display: block;"></em>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <!-- <p></p> -->
+                <img class="img-fluid" src="assets/img/transfer_mnist.png" style="margin-top: 16px;margin-bottom: 8px;">
+                <em class="text-center" style="display: block;">Transfer on MNIST.</em>
+            </div>
+            <div class="col-md-4">
+                <!-- <p></p> -->
+                <img class="img-fluid" src="assets/img/transfer_double.png" style="margin-top: 16px;margin-bottom: 8px;">
+                <em class="text-center" style="display: block;">Transfer on Double-MNIST.</em>
+            </div>
+            <div class="col-md-4">
+                <!-- <p></p> -->
+                <img class="img-fluid" src="assets/img/transfer_triple.png" style="margin-top: 16px;margin-bottom: 8px;">
+                <em class="text-center" style="display: block;">Transfer on Triple-MNIST.</em>
+            </div>
+        </div>
+    </div>
+    <hr style="max-width: 540px;">
+    <div class="container" style="max-width: 540px;">
+        <div class="row">
+            <div class="col-md-12">
+                <h2>Sampling</h2>
+                <p>
+                    Given a small set from an unknown character (right on black background), 
+                    we sample the model and then refine iteratively using the inference model. We show 20 iterations from left to right. 
+                    We can see how the generative process refines its guess at each iteration improving c and z in a joint manner.
+                </p>
+                <img class="img-fluid" src="assets/img/sampling-refine.png" style="margin-bottom: 8px;"><em class="text-center" style="display: block;">Iterative sampling.</em>
+                <img class="img-fluid" src="assets/img/sampling-omniglot.png" style="margin-bottom: 8px;"><em class="text-center" style="display: block;">Stochastic Reconstruction, Input Sets, Conditional, Refined, Unconditional sampling on Omniglot.</em>
+                <img class="img-fluid" src="assets/img/sampling-celeba.png" style="margin-bottom: 8px;"><em class="text-center" style="display: block;">Stochastic Reconstruction, Input Sets, Conditional, Refined, Unconditional sampling on CelebA.</em>
+                <!-- <img class="img-fluid" src="assets/img/test.gif" style="margin-bottom: 8px;"><em class="text-center" style="display: block;"></em> -->
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <p></p>
+                <img class="img-fluid" src="assets/img/test.gif" style="margin-bottom: 8px;"><em class="text-center" style="display: block;"></em>
+            </div>
+            <div class="col-md-6">
+                <p></p> 
+                <img class="img-fluid" src="assets/img/sampling_algo.png" style="margin-bottom: 8px;"><em class="text-center" style="display: block;"></em>
+            </div>
+        </div>
+    </div>
+    <hr style="max-width: 540px;">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/js/bootstrap.bundle.min.js"></script>
+
+
+
+</body></html>
