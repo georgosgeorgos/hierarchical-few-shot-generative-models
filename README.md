@@ -1,6 +1,6 @@
 # Hierarchical Few-Shot Generative Models
 
-Giorgio Giannone, Ole Winther
+[Giorgio Giannone](https://georgosgeorgos.github.io/), [Ole Winther](https://olewinther.github.io/)
 
 This repo contains code and experiments for the paper `Hierarchical Few-Shot Generative Models`.
 
@@ -28,8 +28,15 @@ The first time you run the code you will need to login.
 
 ## Data
 
-We provide preprocessed Omniglot dataset in `data`.
-If you want to try CelebA you first need to download the dataset from [here](https://drive.google.com/drive/folders/0B7EVK8r0v71pTUZsaXdaSnZBZzg).
+We provide preprocessed Omniglot dataset.
+
+From the main folder, copy the data in `data/omniglot_ns/`:
+
+```bash
+wget https://github.com/georgosgeorgos/hierarchical-few-shot-generative-models/releases/download/Omniglot/omni_train_val_test.pkl
+```
+
+For CelebA you need to download the dataset from [here](https://drive.google.com/drive/folders/0B7EVK8r0v71pTUZsaXdaSnZBZzg).
 
 
 ## Dataset
