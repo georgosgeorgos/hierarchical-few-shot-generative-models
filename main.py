@@ -5,6 +5,7 @@ import torch
 from torch import optim
 from torch.nn import functional as F
 from torch.utils import data
+from torch.nn import DataParallel as DP
 
 from dataset import create_loader
 from model import select_model
@@ -17,11 +18,14 @@ def main(args, lst):
     _, val_loader = create_loader(args, split="val", shuffle=True)
     _, test_loader = create_loader(args, split="test", shuffle=False)
 
-    _, vis_loader = create_loader(args, split="vis", shuffle=True)
-    loaders = (train_loader, val_loader, test_loader, vis_loader)
+    #_, vis_loader = create_loader(args, split="vis", shuffle=True)
+    loaders = (train_loader, val_loader, test_loader)
 
     # create model
     model = select_model(args)(**model_kwargs(args))
+    if args.parallel_mode:
+        model = DP(model, device_ids=[0,1]) # assume 2 gpu
+
     args.nparams = count_params(model)
     print(args.nparams)
     model.to(args.device)

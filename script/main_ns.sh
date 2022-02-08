@@ -38,12 +38,12 @@ python main.py --name NS \
 # Run config
 case $RUN in
    omniglot)
-      run omniglot_back_eval binary 5 400 512 100 ns_omniglot
+      run omniglot_back_eval binary 5 1000 512 100 ns_omniglot
       ;;
    omniglot_random)
-      run omniglot_random binary 5 400 512 100 ns_omniglot_r
+      run omniglot_random binary 5 1000 512 100 ns_omniglot_r
       ;;
    omniglot_ns)
-      run omniglot_ns binary 5 400 512 100 ns_omniglot_ns
+      run omniglot_ns binary 5 1000 512 100 ns_omniglot_ns
       ;;
 esac

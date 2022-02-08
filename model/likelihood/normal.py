@@ -94,12 +94,3 @@ class DiscretizedNormalLikelihood(nn.Module):
         # sample = sample.clamp(min=0., max=1.)
         return img
 
-
-if __name__ == "__main__":
-    distro=DiscretizedNormalLikelihood()
-    x=torch.randn(10*5, 3, 64, 64)
-    xp=torch.zeros(10*5, 6, 64, 64)
-
-    logpx = distro(x, xp)
-    print(logpx.size())
-    print(distro.sample(xp).size())

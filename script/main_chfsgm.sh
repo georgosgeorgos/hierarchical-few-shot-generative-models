@@ -30,7 +30,7 @@ python main.py --name CHFSGM \
                --sample-size $SS \
                --sample-size-test $SS \
                --num-classes 1 \
-               --learning-rate 1e-4 \
+               --learning-rate 1e-3 \
                --epochs $EP \
                --batch-size $BS \
                --tag $TAG
@@ -40,19 +40,19 @@ python main.py --name CHFSGM \
 # Run config
 case $RUN in
    celeba_binary)
-      run celeba binary 5 400 256 50 chfsgm_celeba
+      run celeba binary 5 1000 256 50 chfsgm_celeba
       ;;
    celeba_mixlog)
       run celeba discretized_mix_logistic 5 1000 256 50 chfsgm_celeba
       ;;
    omniglot)
-      run omniglot_back_eval binary 5 400 128 100 chfsgm_omniglot
+      run omniglot_back_eval binary 5 1000 128 100 chfsgm_omniglot
       ;;
    omniglot_random)
-      run omniglot_random binary 5 400 128 100 cns_omniglot_r
+      run omniglot_random binary 5 1000 128 100 cns_omniglot_r
       ;;
    omniglot_ns)
-      run omniglot_ns binary 5 400 128 100 chfsgm_omniglot_ns
+      run omniglot_ns binary 5 1000 128 100 chfsgm_omniglot_ns
       ;;
 esac
        

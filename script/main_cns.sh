@@ -25,13 +25,12 @@ python main.py --name CNS \
                --output-dir /output \
                --alpha-step 0.98 \
                --alpha 2 \
-               --dry_run \
                --adjust-lr \
                --scheduler plateau \
                --sample-size $SS \
                --sample-size-test $SS \
                --num-classes 1 \
-               --learning-rate 1e-4 \
+               --learning-rate 2e-4 \
                --epochs $EP \
                --batch-size $BS \
                --tag $TAG
@@ -40,24 +39,21 @@ python main.py --name CNS \
 # Run config
 case $RUN in
    celeba_binary)
-      run celeba binary 5 400 256 50 cns_celeba
+      run celeba binary 5 1000 128 50 cns_celeba
       ;;
    celeba_mixlog)
       run celeba discretized_mix_logistic 5 1000 256 50 cns_celeba
       ;;
    omniglot)
-      run omniglot_back_eval binary 5 400 128 100 cns_omniglot
-      ;;
-   omniglot_random)
-      run omniglot_random binary 5 400 128 100 cns_omniglot_r
+      run omniglot_back_eval binary 5 1000 256 100 cns_omniglot
       ;;
    omniglot_ns)
-      run omniglot_ns binary 5 400 128 100 cns_omniglot_ns
+      run omniglot_ns binary 5 1000 256 100 cns_omniglot_ns
       ;;
    omniglot_ns2)
-      run omniglot_ns binary 2 400 128 100 cns_omniglot_ns2
+      run omniglot_ns binary 2 1000 256 100 cns_omniglot_ns2
       ;;
    omniglot_ns10)
-      run omniglot_ns binary 10 400 128 100 cns_omniglot_ns10
+      run omniglot_ns binary 10 1000 256 100 cns_omniglot_ns10
       ;;
 esac

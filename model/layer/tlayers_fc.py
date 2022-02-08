@@ -65,6 +65,7 @@ from model.layer.layers_fc import PostPool, f_std, FCResBlock, Conv2d3x3
 #         e = beta * e + gamma
 #         return self.activation(e)
 
+
 class AttentiveStatistiC(nn.Module):
     """
     Compute the statistic q(c | X).
@@ -80,23 +81,22 @@ class AttentiveStatistiC(nn.Module):
         activation: specify activation.
     """
 
-    def __init__(self,
-                 hid_dim: int,
-                 c_dim: int,
-                 n_features: int,
-                 activation: nn,
-                 dropout_sample: bool = False,
-                 mode: str="mean",
-                 ):
+    def __init__(
+        self,
+        hid_dim: int,
+        c_dim: int,
+        n_features: int,
+        activation: nn,
+        dropout_sample: bool = False,
+        mode: str = "mean",
+    ):
         super(AttentiveStatistiC, self).__init__()
 
         self.c_dim = c_dim
         self.hid_dim = hid_dim
         self.activation = activation
-        
-        self.postpool = PostPool(self.hid_dim,
-                                 self.c_dim,
-                                 self.activation)
+
+        self.postpool = PostPool(self.hid_dim, self.c_dim, self.activation)
         self.aggregation_module = TBlock(self.hid_dim)
 
     def forward(self, h, bs, ns):
@@ -111,9 +111,10 @@ class AttentiveStatistiC(nn.Module):
         mean, logvar = self.postpool(a)
         return mean, logvar, a, att
 
+
 class TBlock(nn.Module):
     """
-    Transformer block for keys and values over c. 
+    Transformer block for keys and values over c.
     rc = f(c_{l+1}, z_{l+1}).
 
     Attributes:
@@ -124,11 +125,12 @@ class TBlock(nn.Module):
         z_dim: number of features for latent variable.
     """
 
-    def __init__(self,
-                 hid_dim,
-                 n_head=4,
-                 dropout=0.2,
-                 ):
+    def __init__(
+        self,
+        hid_dim,
+        n_head=4,
+        dropout=0.2,
+    ):
         super(TBlock, self).__init__()
         assert hid_dim % n_head == 0
         self.hid_dim = hid_dim
@@ -160,7 +162,7 @@ class TBlock(nn.Module):
             mask = torch.tril(one).view(1, 1, T, T)
         else:
             return sim
-        sim = sim.masked_fill(mask[:, :, :T, :T] == 0, float('-inf'))
+        sim = sim.masked_fill(mask[:, :, :T, :T] == 0, float("-inf"))
         return sim
 
     def forward(self, qq, kv, flag=None):
@@ -179,17 +181,14 @@ class TBlock(nn.Module):
             Updated representations for the context memory at layer l.
         """
         B, T, C = kv.size()
-        #qq = qq.view(B, -1, C)
-        
+        # qq = qq.view(B, -1, C)
+
         # q (B, nh, T, hs)
-        q = self.query(qq).view(B, -1, self.n_head, C //
-                               self.n_head).transpose(1, 2)
+        q = self.query(qq).view(B, -1, self.n_head, C // self.n_head).transpose(1, 2)
         # k (B, nh, T, hs)
-        k = self.key(kv).view(B, -1, self.n_head, C //
-                             self.n_head).transpose(1, 2)
+        k = self.key(kv).view(B, -1, self.n_head, C // self.n_head).transpose(1, 2)
         # v (B, nh, T, hs)
-        v = self.value(kv).view(B, -1, self.n_head, C //
-                               self.n_head).transpose(1, 2)
+        v = self.value(kv).view(B, -1, self.n_head, C // self.n_head).transpose(1, 2)
 
         # sim (B, nh, T, hs) x (B, nh, hs, T) -> (B, nh, T, T)
         sim = (q @ k.transpose(-2, -1)) * (1.0 / np.sqrt(k.shape[-1]))
@@ -197,7 +196,7 @@ class TBlock(nn.Module):
         # sim = self.mask_f(sim)
         # distribution over the context samples
         sim = F.softmax(sim, dim=-1)
-        #sim = self.attn_drop(sim)
+        # sim = self.attn_drop(sim)
 
         # new values for memory
         # (B, nh, T, T) @ (B, nh, T, hs) -> (B, nh, T, hs)
@@ -206,10 +205,11 @@ class TBlock(nn.Module):
         # (B, T, nh*hs)
         out = out.transpose(1, 2).contiguous().view(qq.size())
 
-        #x = self.ln1(qq + out)
-        #x = self.resid_drop(x)
-        #x = self.ln2(x + self.proj(x))
+        # x = self.ln1(qq + out)
+        # x = self.resid_drop(x)
+        # x = self.ln2(x + self.proj(x))
         return out, sim
+
 
 #######################################################################
 # Prior for z - p(z_l | z_{l+1}, c_l)
@@ -246,7 +246,7 @@ class AttentivePriorZ(nn.Module):
         self.drop = nn.Dropout(0.1)
 
         # modules
-        self.linear_c = nn.Linear(self.c_dim, 2*self.hid_dim)
+        self.linear_c = nn.Linear(self.c_dim, 2 * self.hid_dim)
         self.linear_z = nn.Linear(self.z_dim, self.hid_dim)
 
         self.residual_block = FCResBlock(
@@ -281,7 +281,7 @@ class AttentivePriorZ(nn.Module):
             gamma, beta = ec.chunk(2, dim=-1)
             gamma = gamma.view(bs, -1, self.hid_dim).expand_as(ez)
             beta = beta.view(bs, -1, self.hid_dim).expand_as(ez)
-            #ec = ec.view(bs, -1, self.hid_dim).expand_as(ez)
+            # ec = ec.view(bs, -1, self.hid_dim).expand_as(ez)
         else:
             ec = ez.new_zeros((bs, ns, self.hid_dim))
 
@@ -305,12 +305,13 @@ class AttentivePriorZ(nn.Module):
         mean, logvar = e.chunk(2, dim=1)
         return mean, logvar
 
+
 # #######################################################################
 # INFERENCE NETWORK for z - q(z_l | z_{l+1}, c_l, h_l)
 class AttentivePosteriorZ(nn.Module):
     """
     Inference network q(z|h, z, c) gives approximate posterior over latent variables.
-    In this formulation there is no sharing of parameters between generative and inference model. 
+    In this formulation there is no sharing of parameters between generative and inference model.
 
     Attributes:
         batch_size: batch of datasets.
@@ -346,7 +347,7 @@ class AttentivePosteriorZ(nn.Module):
 
         # modules
         self.linear_h = nn.Linear(self.hid_dim, self.hid_dim)
-        self.linear_c = nn.Linear(self.c_dim, 2*self.hid_dim)
+        self.linear_c = nn.Linear(self.c_dim, 2 * self.hid_dim)
         self.linear_z = nn.Linear(self.z_dim, self.hid_dim)
 
         self.residual_block = FCResBlock(
@@ -366,7 +367,7 @@ class AttentivePosteriorZ(nn.Module):
             z: moments for p(z_{l-1} | z_l, c).
             c: context latent representation for layer l.
         Returns:
-            moments for the approximate posterior over z 
+            moments for the approximate posterior over z
             at layer l.
         """
         # combine h, z, and c
@@ -389,7 +390,7 @@ class AttentivePosteriorZ(nn.Module):
             gamma, beta = ec.chunk(2, dim=-1)
             gamma = gamma.view(bs, -1, self.hid_dim).expand_as(ez)
             beta = beta.view(bs, -1, self.hid_dim).expand_as(ez)
-            #ec = ec.view(bs, -1, self.hid_dim).expand_as(eh)
+            # ec = ec.view(bs, -1, self.hid_dim).expand_as(eh)
         else:
             ec = eh.new_zeros(eh.size())
 
@@ -407,11 +408,13 @@ class AttentivePosteriorZ(nn.Module):
         e = e.view(-1, 1, 2 * self.z_dim)
         e = self.bn_params(e)
         e = e.view(-1, 2 * self.z_dim)
-        
+
         mean, logvar = e.chunk(2, dim=1)
         return mean, logvar
 
+
 #######################################################################
+
 
 class AttentivePriorC(nn.Module):
     """
@@ -428,22 +431,23 @@ class AttentivePriorC(nn.Module):
         activation: specify activation.
     """
 
-    def __init__(self,
-                 num_layers: int,
-                 hid_dim: int,
-                 c_dim: int,
-                 z_dim: int,
-                 h_dim: int,
-                 activation: nn,
-                 mode: str = "mean",
-                 ladder=False
-                 ):
+    def __init__(
+        self,
+        num_layers: int,
+        hid_dim: int,
+        c_dim: int,
+        z_dim: int,
+        h_dim: int,
+        activation: nn,
+        mode: str = "mean",
+        ladder=False,
+    ):
         super(AttentivePriorC, self).__init__()
 
         self.num_layers = num_layers
         self.hid_dim = hid_dim
         self.mode = mode
-        
+
         self.ladder = ladder
         self.k = 2
         if ladder:
@@ -466,10 +470,7 @@ class AttentivePriorC(nn.Module):
         #     batch_norm=True,
         # )
 
-        self.postpool = PostPool(self.hid_dim,
-                                 self.c_dim,
-                                 self.activation,
-                                 self.ladder)
+        self.postpool = PostPool(self.hid_dim, self.c_dim, self.activation, self.ladder)
 
     def forward(self, z, c, bs, ns):
         """
@@ -478,7 +479,7 @@ class AttentivePriorC(nn.Module):
 
         Args:
             z: latent for samples at layer l+1.
-            rc: latent representations for context at layer l+1. 
+            rc: latent representations for context at layer l+1.
             (batch_size, sample_size, hid_dim)
 
         Returns:
@@ -487,7 +488,7 @@ class AttentivePriorC(nn.Module):
         """
         ec = self.linear_c(c)
         ec = ec.view(bs, -1, self.hid_dim)
-        
+
         if z is not None:
             ez = self.linear_z(z)
             ez = ez.view(bs, ns, self.hid_dim)
@@ -495,16 +496,16 @@ class AttentivePriorC(nn.Module):
             ez = ec.new_zeros(ec.size())
 
         e = ez + ec.expand_as(ez)
-        #e = e.view(-1, self.hid_dim)
-        #e = self.activation(e)
-        #e = self.residual_block(e)
+        # e = e.view(-1, self.hid_dim)
+        # e = self.activation(e)
+        # e = self.residual_block(e)
 
         # map e to the moments
         e = e.view(bs, -1, self.hid_dim)
         z = e.mean(dim=1)
         a, att = self.aggregation_module(z, e)
-       
-        #a = a.unsqueeze(1) + ec
+
+        # a = a.unsqueeze(1) + ec
         # map to moments
         if self.ladder:
             mean, logvar, feats = self.postpool(a)
@@ -516,11 +517,12 @@ class AttentivePriorC(nn.Module):
 
 #######################################################################
 
+
 class AttentivePosteriorC(nn.Module):
     """
-    Inference network q(c_l|c_{l+1}, z_{l+1}, H) 
+    Inference network q(c_l|c_{l+1}, z_{l+1}, H)
     gives approximate posterior over latent context.
-    In this formulation there is no sharing of 
+    In this formulation there is no sharing of
     parameters between generative and inference model.
 
     Attributes:
@@ -534,16 +536,17 @@ class AttentivePosteriorC(nn.Module):
         activation: specify activation.
     """
 
-    def __init__(self,
-                 num_layers: int,
-                 hid_dim: int,
-                 c_dim: int,
-                 z_dim: int,
-                 h_dim: int,
-                 activation: nn,
-                 mode: str = "mean",
-                 ladder=False
-                 ):
+    def __init__(
+        self,
+        num_layers: int,
+        hid_dim: int,
+        c_dim: int,
+        z_dim: int,
+        h_dim: int,
+        activation: nn,
+        mode: str = "mean",
+        ladder=False,
+    ):
         super(AttentivePosteriorC, self).__init__()
 
         self.num_layers = num_layers
@@ -573,14 +576,11 @@ class AttentivePosteriorC(nn.Module):
         #     batch_norm=True,
         # )
 
-        self.postpool = PostPool(self.hid_dim,
-                                 self.c_dim,
-                                 self.activation,
-                                 self.ladder)
+        self.postpool = PostPool(self.hid_dim, self.c_dim, self.activation, self.ladder)
 
     def forward(self, h, z, c, bs, ns):
         """
-        Combine h, z, and c to parameterize the moments of the approximate 
+        Combine h, z, and c to parameterize the moments of the approximate
         posterior over c.
         Combine z and rc using the attention mechanism and aggregating.
         Embed z if we have more than one stochastic layer.
@@ -604,7 +604,7 @@ class AttentivePosteriorC(nn.Module):
             ez = ez.view(bs, ns, -1)
         else:
             ez = eh.new_zeros(eh.size())
-        
+
         # map rc to keys and values
         ec = c.view(-1, self.c_dim)
         ec = self.linear_c(ec)
@@ -612,9 +612,9 @@ class AttentivePosteriorC(nn.Module):
 
         # (b, sc, hdim)
         e = eh + ez + ec.expand_as(eh)
-        #e = e.view(-1, self.hid_dim)
-        #e = self.activation(e)
-        #e = self.residual_block(e)
+        # e = e.view(-1, self.hid_dim)
+        # e = self.activation(e)
+        # e = self.residual_block(e)
 
         e = e.view(bs, -1, self.hid_dim)
         z = e.mean(dim=1)
@@ -628,6 +628,7 @@ class AttentivePosteriorC(nn.Module):
         # map to moments
         mean, logvar = self.postpool(a)
         return mean, logvar, a, att, None
+
 
 # class AttentiveObservationDecoder(nn.Module):
 #     """
@@ -736,41 +737,3 @@ class AttentivePosteriorC(nn.Module):
 #         # moments for the Bernoulli
 #         p = torch.sigmoid(e)
 #         return p
-
-
-if __name__ == "__main__":
-
-    import torch.distributions as td
-    def test_layers():
-        c_dim = 3
-        z_dim = 36
-        h_dim = 100
-
-        num_layers = 2
-        hid_dim = 128
-        batch_size = 10
-        sample_size = 5
-
-        bs = batch_size
-        ns = sample_size
-
-        n_stochastic_z = 3
-        n_stochastic_c = 3
-
-        activation = nn.ReLU()
-
-        statistics_network = StatisticNetwork(hid_dim,
-                                              c_dim,
-                                              h_dim,
-                                              activation
-                                              )
-        h = torch.rand((batch_size, sample_size, hid_dim))
-        print('embedding data size: {}'.format(h.size()))
-
-        # q(c_L | D)
-        mean, logvar, rcq = statistics_network.forward(h, bs, ns)
-        cd = td.Normal(mean, f_std(logvar))
-        c = cd.rsample()
-        print('summary size: {}'.format(c.size()))
-
-    test_layers()

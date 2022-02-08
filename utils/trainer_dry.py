@@ -30,7 +30,7 @@ def eval_model(args, model, loader, lst):
 def run(args, model, optimizer, scheduler, loaders, lst):
     scheduler = StepLR(optimizer, step_size=50, gamma=args.lr_step)
 
-    train_loader, val_loader, test_loader, _ = loaders
+    train_loader, val_loader, test_loader = loaders
     args.len_tr = len(train_loader.dataset)
     args.len_vl = len(val_loader.dataset)
     args.len_ts = len(test_loader.dataset)

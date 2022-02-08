@@ -27,7 +27,8 @@ class BaseSetsDataset(data.Dataset):
                  split='train',
                  augment=False,
                  norm=False,
-                 binarize=False):
+                 binarize=False,
+                 get_lbl=False):
         super(BaseSetsDataset, self).__init__()
 
         self.dts = {"omniglot_back_eval": {"size": 28, "img_cls": 20, "nc": 1, "tr": 964, "vl": 97, "ts": 659},
@@ -51,6 +52,8 @@ class BaseSetsDataset(data.Dataset):
         self.size = self.dts[dataset]["size"]
         self.img_cls = self.dts[dataset]["img_cls"]
         self.n_bits = 8
+
+        self.get_lbl=get_lbl
 
         self.images, self.labels, self.map_cls = self.get_data()
         self.split_train_val()
@@ -112,7 +115,7 @@ class BaseSetsDataset(data.Dataset):
         if self.dataset in ['minimagenet', 'cub', 'cifar100'] and self.norm:
             # rescale to [-1, 1]
             samples = 2 * samples - 1
-        if lbl:
+        if self.get_lbl or lbl:
             targets = self.data['targets'][item]
             return samples, targets
         return samples
@@ -202,4 +205,4 @@ class BaseSetsDataset(data.Dataset):
                 self.labels = self.labels[s:]
                 self.labels = np.arange(self.labels.shape[0]).reshape(-1, 1)
                 self.labels = self.labels.repeat(self.img_cls, 1)
-                
+

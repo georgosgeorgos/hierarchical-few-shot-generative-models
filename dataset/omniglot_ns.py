@@ -9,6 +9,7 @@ from skimage.transform import rotate
 from torch.utils import data
 
 
+# adapted from durkan
 class OmniglotSetsDatasetNS(data.Dataset):
     def __init__(self, 
                  dataset,
@@ -47,6 +48,7 @@ class OmniglotSetsDatasetNS(data.Dataset):
 
     def init_sets(self):
         sets, set_labels = self.make_sets(self.images, self.labels)
+        
         if self.split in ['train', 'val']:
             if self.augment:
                 sets = self.augment_sets(sets)
@@ -214,3 +216,4 @@ def load_mnist_test_batch(args):
     #label = np.array([labels[ix] for ix in ixs])
     return torch.from_numpy(batch).clone().repeat((args.batch_size // 10) + 1, 1, 1)[:args.batch_size]
     
+

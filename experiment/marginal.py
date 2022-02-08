@@ -13,7 +13,9 @@ import numpy as np
 import torch
 import torchvision
 
-sys.path.insert(0, os.path.join(str(Path.home()), "hierarchical-few-shot-generative-models"))
+sys.path.insert(
+    0, os.path.join(str(Path.home()), "hierarchical-few-shot-generative-models")
+)
 
 from dataset import create_loader
 from dataset.omniglot_ns import load_mnist_test_batch
@@ -25,12 +27,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument(
     "--output-dir",
     type=str,
-    default="./output",
+    default="/output",
     help="output directory for checkpoints and figures",
-)
-# dataset
-parser.add_argument(
-    "--dataset", type=str, default="omniglot_ns", help="select dataset",
 )
 
 
@@ -39,7 +37,7 @@ def marginal_loglikelihood(model, dataloader, S=1000):
 
     for batch in dataloader:
         # batchwise likelihoods
-        batch_mll = []
+        batch_mll = []  # store importance samples for batch x
         with torch.no_grad():
             x = batch
             x = x.to(args.device)
@@ -47,21 +45,31 @@ def marginal_loglikelihood(model, dataloader, S=1000):
             ns = x.shape[1]
             S = 1
             for s in range(S):
-                if s % 100 == 0:
-                    print(s)
-                out = model.forward(x)
-                loss = model.loss(out)
+                # if s % 100 == 0:
+                #    print(s)
+                # compute vlb
+                out = model.forward(x, limit_layer=None)
+                # loss = model.loss(out)
                 out = model.compute_mll(out)
+                # (batch, 1)
                 llh = out["vlb"].view(-1, 1)
+                # append loglikekihood for importance sample s
                 batch_mll.append(llh)
-            # stack over importance samples
+            # stack over S importance samples
             tmp = torch.stack(batch_mll, dim=1)
+
+            # store (batch, S) importance samples for batch x
             mll_test.extend(tmp)
             # print(len(mll))
 
     # stack over batch
+    # (dataset_size, S)
     mll_test = torch.stack(mll_test, dim=0)
-    mll_test = np.log(S) - torch.logsumexp(mll_test, dim=1)
+    # number of importance samples
+    const = mll_test.shape[1]
+    print(const)
+    # logsumexp over importance samples
+    mll_test = np.log(const) - torch.logsumexp(mll_test, dim=1)
     mll_test = mll_test.cpu().data.numpy()
     return mll_test
 
@@ -104,19 +112,19 @@ def main(args, epoch=400, split="test"):
     init_folder(args)
     batch_size = args.batch_size
 
-    for context_size in [5]:
+    for context_size in [2, 5, 10, 20]:
 
         args.sample_size_test = context_size
         args.sample_size = context_size
         # dataloader
-        args.batch_size = (batch_size // context_size) * args.sample_size
+        args.batch_size = int((batch_size / context_size) * args.sample_size)
         args.split = split
         args.augment = False
         _, loader_test = create_loader(args, split="test", shuffle=False)
         mll_test = marginal_loglikelihood(model, loader_test)
-        
+
         print(context_size)
-        print("mll_test", np.mean(mll_test), len(mll_test))
+        print("mll_test", np.mean(mll_test) / args.sample_size, len(mll_test))
         # save_mll(args, mll_test, epoch)
         print()
 
@@ -124,19 +132,21 @@ def main(args, epoch=400, split="test"):
 if __name__ == "__main__":
     s = 0
     s = set_seed(s)
-
     args = parser.parse_args()
-    
-    args.name=""
-    args.timestamp=""
-    args.tag=""
-    
+
+    args.likelihood = "binary"
+
+    args.name = ""
+    args.timestamp = ""
+    args.tag = ""
     args.dataset = "omniglot_ns"
+    epoch = 600
+
     args = set_paths(args)
     args = load_args(args)
+
     print()
     print(args)
     print()
 
-    epoch = 400
     main(args, epoch)

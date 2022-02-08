@@ -239,10 +239,11 @@ class VAE(BaseModel):
             #kl_z += td.kl_divergence(zqd[l], zpd[l]).sum(-1)
             kl_z += (zqd[l].log_prob(zqs[l]) - zpd[l].log_prob(zqs[l])).sum(-1)
         
-        logpx = logpx.view(bs, -1)#.sum(-1) / ns
-        kl_z = kl_z.view(bs, -1)#.sum(-1) / ns
+        logpx = logpx.view(-1)
+        kl_z = kl_z.view(-1)
         
         kl = kl_z
         # Variational lower bound and weighted loss
         vlb = logpx - kl
         return {"vlb": vlb.squeeze()}
+

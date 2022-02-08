@@ -22,11 +22,3 @@ class BernoulliLikelihood(nn.Module):
             xp = px.sample()
         return xp
 
-if __name__ == "__main__":
-    distro=BernoulliLikelihood()
-    x=torch.randn(10, 5, 3, 64, 64)
-    xp=torch.zeros(10, 5, 3, 64, 64)
-
-    logpx = distro(x, xp)
-    print(logpx.size())
-    print(distro.sample(xp).size())

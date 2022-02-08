@@ -6,7 +6,7 @@ import pickle
 from scipy.io import loadmat
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--data-dir', type=str, default="./data/omniglot_ns")
+parser.add_argument('--data-dir', type=str, default="/data/omniglot_ns")
 
 def _load():
     # load data

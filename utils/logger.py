@@ -61,13 +61,15 @@ class Logger:
         self.add_log(val_log, "val", epoch)
         self.add_log(test_log, "test", epoch)
 
-    def update_best(self, test_log):
+    def update_best(self, val_log, test_log, epoch):
         # maximize the lower-bound
-        if test_log["vlb"] > self.best_vlb:
-            self.best_vlb = test_log["vlb"]
+        if val_log["vlb"] > self.best_vlb:
+            self.best_vlb = val_log["vlb"]
+            self.writer_wb.summary['best_vlb'] = test_log["vlb"]
+            self.writer_wb.summary['best_epoch'] = epoch
             for l in self.lst:
                 self.writer_wb.summary[l] = test_log[l]
-
+            
     def get_metric(self):
         return self.metrics
 

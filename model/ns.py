@@ -176,6 +176,15 @@ class NS(BaseModel):
         out["xp"] = xp.view(bs, ns, 1, 28, 28)
         return out
 
+    def reconstruction(self, x):
+        bs=x.shape[0] 
+        ns=x.shape[1]
+        xp = self.forward(x)["xp"]
+        xp = xp.view(bs*ns, -1, self.img_dim, self.img_dim)
+        rec = self.likelihood.sample(xp)
+        rec = rec.view(bs, ns, -1, self.img_dim, self.img_dim)
+        return rec
+
     def loss(self, 
              out: dict, 
              weight: float=1.0,
@@ -437,11 +446,9 @@ class NS(BaseModel):
             #kl_z += td.kl_divergence(zqd[l], zpd[l]).sum(-1)
             kl_z += (zqd[l].log_prob(zqs[l]) - zpd[l].log_prob(zqs[l])).sum(-1)
         
-        logpx = logpx.view(bs, -1)#.sum(-1) / ns
-        # kl_c = kl_c.view(self.batch_size, -1).mean(-1)
-        kl_z = kl_z.view(bs, -1)#.sum(-1) / ns
-        
-        kl_c = kl_c.view(bs, -1).repeat(1, ns) / ns
+        logpx = logpx.view(bs, -1).sum(-1)
+        kl_z = kl_z.view(bs, -1).sum(-1)
+        kl_c = kl_c.squeeze()
         
         kl = kl_c + kl_z
         # Variational lower bound and weighted loss

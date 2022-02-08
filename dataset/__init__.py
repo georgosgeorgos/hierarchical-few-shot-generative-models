@@ -12,7 +12,7 @@ from dataset.util.transforms import DynamicBinarize, StaticBinarize
 
 def select_dataset(args, split):
     if split == "vis":
-        split = "test"
+        split = "val"
     kwargs = {
         "dataset": args.dataset,
         "data_dir": args.data_dir,
@@ -66,3 +66,80 @@ def create_loader(args, split, shuffle, drop_last=False):
     return dataset, loader
 
 
+if __name__ == "__main__":
+    import argparse
+
+    import numpy as np
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--name", default="FSGM", type=str, help="readable name for run",
+    )
+    parser.add_argument(
+        "--data-dir",
+        type=str,
+        default="/home/gigi/ns_data",
+        help="location of formatted Omniglot data",
+    )
+    parser.add_argument(
+        "--output-dir",
+        type=str,
+        default="/home/gigi/ns_output",
+        help="output directory for checkpoints and figures",
+    )
+    parser.add_argument(
+        "--tag", type=str, default="", help="readable tag for interesting runs",
+    )
+    # dataset
+    parser.add_argument(
+        "--dataset",
+        type=str,
+        default="omniglot_ns",
+        help="select dataset (omniglot_ns, omniglot, mini_imagenet, fc100)",
+    )
+    # parse args
+    args = parser.parse_args()
+
+    args.dataset = "minimagenet"
+    args.batch_size = 10
+    args.num_classes = 1
+    args.num_workers = 1
+    args.sample_size = 5
+    args.sample_size_test = 5
+
+    args.binarize = False
+    args.augment = True
+    args.download = True
+    shuffle = True
+    args.split = "train"
+    args.drop_last = False
+
+    for d in [
+        #"minimagenet",
+        "cifar100",
+        #"cub",
+        #"omniglot_back_eval",
+        #"omniglot_ns_trts",
+        #"doublemnist",
+        #"triplemnist",
+    ]:
+        print(d)
+        args.dataset = d
+        _, train_loader = create_loader(args, split="train", shuffle=True)
+        print()
+        _, test_loader = create_loader(args, split="test", shuffle=False)
+        print(len(train_loader), len(test_loader))
+        print(len(train_loader.dataset), len(test_loader.dataset))
+        batch = next(iter(train_loader))
+        print(batch.size())
+        print(batch.min(), batch.max())
+        print()
+        
+        import matplotlib.pyplot as plt
+        tmp = batch[0][0].permute(1, 2, 0).cpu().numpy()
+        tmp += 1
+        tmp *= 127.5 
+        tmp = tmp.astype(int)
+        plt.imshow(tmp)
+        plt.savefig("_img/tmp.png")
+        

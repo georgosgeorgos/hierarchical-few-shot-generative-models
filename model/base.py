@@ -26,6 +26,7 @@ class BaseModel(nn.Module):
         activation: specify activation.
         print_parameters: print name and parameters for each layer.
     """
+
     def __init__(
         self,
         img_dim: int,
@@ -41,20 +42,31 @@ class BaseModel(nn.Module):
         h_dim: int,
         n_stochastic: int,
         activation: nn,
-        dropout_sample: bool=False,
-        print_parameters: bool=False,
-        aggregation_mode: str="mean",
-        ladder: bool=False,
-        ll: str="binary"
+        dropout_sample: bool = False,
+        print_parameters: bool = False,
+        aggregation_mode: str = "mean",
+        ladder: bool = False,
+        ll: str = "binary",
+        str_enc: str = "",
+        str_dec: str = "",
+        str_gen_z: str = "",
+        str_gen_c: str = "",
+        pixelcnn_mode: bool = False,
+        parallel_mode: bool = False,
     ):
         super(BaseModel, self).__init__()
+        # model
+        self.str_enc = str_enc
+        self.str_dec = str_dec
+        self.str_gen_z = str_gen_z
+        self.str_gen_c = str_gen_c
         # dataset
         self.in_ch = in_ch
         self.img_dim = img_dim
         # output shared encoder
         self.ch_enc = ch_enc
         self.n_features = 4 * ch_enc * 4 * 4
-        self.h_dim = self.n_features #h_dim
+        self.h_dim = self.n_features  # h_dim
         # latent c
         self.c_dim = c_dim
         self.hidden_dim_c = hidden_dim_c
@@ -73,19 +85,25 @@ class BaseModel(nn.Module):
         self.ladder = ladder
         self.ll = ll
         self.likelihood = select_likelihood(ll)()
-        
+
+        self.pixelcnn_mode = pixelcnn_mode
+        self.parallel_mode = parallel_mode
+
         # initialize weights
         self.apply(self.weights_init)
         # print variables for sanity check and debugging
         self.print_model()
 
-        self.lst = ["zqs", "zqd",  # posterior z
-                    "cqs", "cqd",  # posterior c
-                    "zpd",         # prior z
-                    "cpd",         # prior c
-                    "h",           # data
-                    "att"          # attention over context
-                    ]
+        self.lst = [
+            "zqs",
+            "zqd",  # posterior z
+            "cqs",
+            "cqd",  # posterior c
+            "zpd",  # prior z
+            "cpd",  # prior c
+            "h",  # data
+            "att",  # attention over context
+        ]
 
     def print_model(self):
         if self.print_parameters:
@@ -97,43 +115,37 @@ class BaseModel(nn.Module):
     def count_params(self):
         nparams = sum(p.numel() for p in self.parameters() if p.requires_grad)
         print("Number trainable parameters: ", nparams)
-    
+
     def forward(self, x: torch.Tensor) -> dict:
         """
         Args:
             x: batch of (small) datasets.
-        Returns: collection of lists with priors for z and c, 
-                 approximate posteriors for z and c, 
+        Returns: collection of lists with priors for z and c,
+                 approximate posteriors for z and c,
                  representations for X and x.
         """
         pass
 
-    def normal(self,    
-               loc: torch.Tensor, 
-               log_var: torch.Tensor
-               ):
-        scale = torch.exp(log_var/2)
+    def normal(self, loc: torch.Tensor, log_var: torch.Tensor):
+        scale = torch.exp(log_var / 2)
         distro = td.Normal(loc=loc, scale=scale)
         return distro
 
     def standard_normal(self, sample: torch.Tensor):
         n01 = td.Normal(
-        loc=sample.new_zeros(sample.shape),
-        scale=sample.new_ones(sample.shape)
+            loc=sample.new_zeros(sample.shape), scale=sample.new_ones(sample.shape)
         )
         return n01
 
-    def loss(self, 
-             out: dict, 
-             weight: float=1.0,
-             free_bits: bool = False
-             ) -> (torch.Tensor, torch.Tensor):
+    def loss(
+        self, out: dict, weight: float = 1.0, free_bits: bool = False
+    ) -> (torch.Tensor, torch.Tensor):
         """
         Perform variational inference and compute the loss.
 
         Args:
-            out: collection of lists with priors for z and c, 
-                 approximate posteriors for z and c, 
+            out: collection of lists with priors for z and c,
+                 approximate posteriors for z and c,
                  representations for X and x.
             weight: reweights the lower-bound.
         Returns:
@@ -141,13 +153,14 @@ class BaseModel(nn.Module):
         """
         pass
 
-    def step(self, 
-             x: torch.Tensor, 
-             alpha: float, 
-             optimizer: nn, 
-             clip_gradients: bool=True,
-             free_bits: float=0.0
-             ) -> dict:
+    def step(
+        self,
+        x: torch.Tensor,
+        alpha: float,
+        optimizer: nn,
+        clip_gradients: bool = True,
+        free_bits: float = 0.0,
+    ) -> dict:
         """
         Standard training step.
 
@@ -166,20 +179,25 @@ class BaseModel(nn.Module):
         outputs = self.forward(x)
         loss_dict = self.loss(outputs, weight=(alpha + 1), free_bits=free_bits)
         loss = loss_dict["loss"]
-        # perform gradient update
-        optimizer.zero_grad()
-        loss.backward()
-        
-        if clip_gradients:
-            for param in self.parameters():
-                if param.grad is not None:
-                    param.grad.data = param.grad.data.clamp(min=-0.5, max=0.5)
 
-        optimizer.step()
+        if sum(torch.isnan(torch.tensor([loss]))) > 0:
+            optimizer.zero_grad()
+        else:
+            # perform gradient update
+            optimizer.zero_grad()
+            loss.backward()
+
+            if clip_gradients:
+                for param in self.parameters():
+                    if param.grad is not None:
+                        param.grad.data = param.grad.data.clamp(min=-1, max=1)
+            optimizer.step()
         # output loss, vlb, logpx, kl
         return loss_dict
 
-    def unconditional_sample(self,):
+    def unconditional_sample(
+        self,
+    ):
         """
         Sample the model unconditionally.
 
@@ -189,15 +207,24 @@ class BaseModel(nn.Module):
             Sample from the model.
         """
         pass
-    
+
     def save(self, optimizer, path):
-        torch.save(
-            {
-                "model_state": self.state_dict(),
-                "optimizer_state": optimizer.state_dict(),
-            },
-            path,
-        )
+        if self.parallel_mode:
+            torch.save(
+                {
+                    "model_state": self.module.state_dict(),
+                    "optimizer_state": optimizer.state_dict(),
+                },
+                path,
+            )
+        else:
+            torch.save(
+                {
+                    "model_state": self.state_dict(),
+                    "optimizer_state": optimizer.state_dict(),
+                },
+                path,
+            )
 
     @staticmethod
     def weights_init(m):
@@ -206,4 +233,5 @@ class BaseModel(nn.Module):
             init.constant_(m.bias.data, 0)
         elif isinstance(m, nn.BatchNorm1d):
             pass
-        
+
+

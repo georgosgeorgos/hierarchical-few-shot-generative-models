@@ -14,8 +14,8 @@ TAG=$7
 
 CUDA_VISIBLE_DEVICES=$GPU \
 
-python main.py --name VAE \
-               --model vae \
+python main.py --name TNS \
+               --model tns \
                --augment \
                --dataset $DATASET \
                --likelihood $LL \
@@ -38,12 +38,12 @@ python main.py --name VAE \
 # Run config
 case $RUN in
    omniglot)
-      run omniglot_back_eval binary 1 600 512 100 vae_omniglot
+      run omniglot_back_eval binary 5 600 512 100 tns_omniglot
       ;;
    omniglot_random)
-      run omniglot_random binary 1 1000 512 100 vae_omniglot_r
+      run omniglot_random binary 5 600 512 100 tns_omniglot_r
       ;;
    omniglot_ns)
-      run omniglot_ns binary 1 1000 512 100 vae_omniglot_ns
+      run omniglot_ns binary 5 600 512 100 tns_omniglot_ns
       ;;
 esac

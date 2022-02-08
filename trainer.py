@@ -43,7 +43,7 @@ def run(args, model, optimizer, scheduler, loaders, lst):
     mkdirs(args.run_dir)
 
 
-    train_loader, val_loader, test_loader, vis_loader = loaders
+    train_loader, val_loader, test_loader = loaders
     args.len_tr = len(train_loader.dataset)
     args.len_vl = len(val_loader.dataset)
     args.len_ts = len(test_loader.dataset)
@@ -51,8 +51,9 @@ def run(args, model, optimizer, scheduler, loaders, lst):
     print(len(train_loader))
     print(len(test_loader))
     # batches for samples grid visualization
-    omni_test_batch = next(iter(vis_loader))
-    mnist_test_batch = load_mnist_test_batch(args)
+    if args.is_vis:
+        omni_test_batch = next(iter(vis_loader))
+        mnist_test_batch = load_mnist_test_batch(args)
     
     # save configurations
     cfg = save_args(args)
@@ -101,7 +102,7 @@ def run(args, model, optimizer, scheduler, loaders, lst):
         logger.add_logs(train_log, val_log, test_log, epoch)
 
         # check best vlb
-        logger.update_best(test_log)
+        logger.update_best(val_log, test_log, epoch)
 
         # update learning rate if learning plateu
         if args.adjust_lr and args.dataset not in ["celeba"]:

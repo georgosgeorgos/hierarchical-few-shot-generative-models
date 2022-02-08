@@ -18,24 +18,24 @@ def parse_args():
         "--name", type=str, help="readable name for run",
     )
     parser.add_argument(
-        "--model", type=str, help="select model",
+        "--model", type=str, help="select model {fsgm, lns, ns}",
     )
     parser.add_argument(
         "--data-dir",
         type=str,
-        default="./data",
+        default="/home/data",
         help="location of formatted Omniglot data",
     )
     parser.add_argument(
         "--mnist-data-dir",
         type=str,
-        default="./data/mnist",
+        default="/home/data/mnist",
         help="location of MNIST data (required for few shot learning)",
     )
     parser.add_argument(
         "--output-dir",
         type=str,
-        default="./output",
+        default="/home/gigi/ns_output",
         help="output directory for checkpoints and figures",
     )
 
@@ -52,7 +52,7 @@ def parse_args():
     )
     # optmizer
     parser.add_argument(
-        "--optimizer", type=str, default="adam", help="optimizer {adam, sgd}",
+        "--optimizer", type=str, default="adam", help="optimizer {adam, adamw, sgd}",
     )
 
     parser.add_argument(
@@ -201,6 +201,41 @@ def parse_args():
         action="store_true",
         help="whether to print all trainable parameters for sanity check ",
     )
+
+    parser.add_argument(
+        "--parallel_mode",
+        action="store_true",
+        help="use data parallelism on gpu",
+    )
+
+    parser.add_argument(
+        "--str-enc",
+        type=str,
+        default="32-4,16-4,8-2,4-2,2-2,1-2",
+        help="(res, group) for encoder.",
+    )
+
+    parser.add_argument(
+        "--str-gen-z",
+        type=str,
+        default="8-2,4-2,2-2,1-2",
+        help="(res, group) for prior/posterior z.",
+    )
+
+    parser.add_argument(
+        "--str-gen-c",
+        type=str,
+        default="8-2,4-2,2-2,1-2",
+        help="(res, group) for prior/posterior c.",
+    )
+
+    parser.add_argument(
+        "--str-dec",
+        type=str,
+        default="32-4,16-4,8-2",
+        help="(res, group) for decoder.",
+    )
+
     parser.add_argument(
         "--learning-rate",
         type=float,
@@ -241,7 +276,7 @@ def parse_args():
     )
 
     parser.add_argument(
-        "--epochs", type=int, default=300, help="number of epochs for training",
+        "--epochs", type=int, default=1000, help="number of epochs for training",
     )
     parser.add_argument(
         "--alpha", type=int, default=1, help="weighting loss hyperparameter",
@@ -264,7 +299,11 @@ def parse_args():
     )
 
     parser.add_argument(
-        "--aggregation_mode", type=str, default="mean", help="aggregation",
+        "--pixelcnn-mode", action="store_true", help="use pixelcnn decoder",
+    )
+
+    parser.add_argument(
+        "--aggregation-mode", type=str, default="mean", help="aggregation",
     )
 
     # vis and log
@@ -297,7 +336,7 @@ def parse_args():
     )
 
     parser.add_argument(
-        "--dry_run", action="store_true", help="run training without logs, vis, ckpt",
+        "--dry-run", action="store_true", help="run training without logs, vis, ckpt",
     )
 
     parser.add_argument(
@@ -305,7 +344,7 @@ def parse_args():
     )
 
     parser.add_argument(
-        "--is_vis", action="store_true", help="samples and visualizations during training",
+        "--is-vis", action="store_true", help="samples and visualizations during training",
     )
 
     args = parser.parse_args()

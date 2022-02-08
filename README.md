@@ -28,15 +28,8 @@ The first time you run the code you will need to login.
 
 ## Data
 
-We provide preprocessed Omniglot dataset.
-
-From the main folder, copy the data in `data/omniglot_ns/`:
-
-```bash
-wget https://github.com/georgosgeorgos/hierarchical-few-shot-generative-models/releases/download/Omniglot/omni_train_val_test.pkl
-```
-
-For CelebA you need to download the dataset from [here](https://drive.google.com/drive/folders/0B7EVK8r0v71pTUZsaXdaSnZBZzg).
+We provide preprocessed Omniglot dataset in `data`.
+If you want to try CelebA you first need to download the dataset from [here](https://drive.google.com/drive/folders/0B7EVK8r0v71pTUZsaXdaSnZBZzg).
 
 
 ## Dataset
@@ -73,14 +66,15 @@ In `model` we implement baselines and model variants.
 * `thfsgm.py` - HFSGM with learnable aggregation (HFSGM-LAG).
 * `chfsgm.py` - HFSGM with convolutional latent space (CHFSGM).
 * `cthfsgm.py` - CHFSGM with learnable aggregation (CHFSGM-LAG).
+* `chfsgm_multi.py` - Set-Context-Hierarchical-Aggregation Variational Autoencoder (SCHA-VAE).
 
 ## Script
 Scripts used for training the models in the paper.
 
-To run a CNS on Omniglot:
+To run a SCHA-VAE on Omniglot:
 
 ```bash
-sh script/main_cns.sh GPU_NUMBER omniglot_ns
+sh script/main_chfsgm_multi.sh GPU_NUMBER omniglot_ns
 ```
 
 ------
@@ -89,8 +83,8 @@ sh script/main_cns.sh GPU_NUMBER omniglot_ns
 To train a generic model run:
 
 ```python
-python main.py --name {VAE, NS, CNS, CTNS, CHFSGM, CTHFSGM} \
-               --model {vae, ns, cns, ctns, chfsgm, cthfsgm} \
+python main.py --name {VAE, NS, CNS, CTNS, CHFSGM, CTHFSGM, CHFSGM_MULTISCALE} \
+               --model {vae, ns, cns, ctns, chfsgm, cthfsgm, chfsgm_multiscale} \
                --augment \
                --dataset omniglot_ns \
                --likelihood binary \
@@ -122,3 +116,4 @@ A lot of code and ideas borrowed from:
 * https://github.com/addtt/ladder-vae-pytorch
 * https://github.com/vlievin/biva-pytorch
 * https://github.com/didriknielsen/survae_flows
+* https://github.com/openai/vdvae

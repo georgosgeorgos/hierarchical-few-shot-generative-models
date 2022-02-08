@@ -144,7 +144,8 @@ class PostPool(nn.Module):
         self.ladder = ladder
 
         self.k = 2
-        if ladder: self.k = 3
+        if ladder:
+            self.k = 3
 
         # modules
         self.linear_layers = nn.ModuleList(
@@ -181,6 +182,7 @@ class PostPool(nn.Module):
             mean, logvar = e.chunk(self.k, dim=1)
             return mean, logvar
 
+
 ########################################################################
 class StatistiC(nn.Module):
     """
@@ -210,7 +212,7 @@ class StatistiC(nn.Module):
         self.mode = mode
         self.hid_dim = hid_dim
         self.activation = activation
-        
+
         self.postpool = PostPool(self.hid_dim, self.c_dim, self.activation)
 
     def forward(self, h, bs, ns):
@@ -329,13 +331,10 @@ class EncoderBottomUp(nn.Module):
         activation: specify activation.
 
     """
-    def __init__(self,
-                 num_layers: int,
-                 hid_dim: int,
-                 activation: nn
-                 ):
+
+    def __init__(self, num_layers: int, hid_dim: int, activation: nn):
         super(EncoderBottomUp, self).__init__()
-    
+
         self.hid_dim = hid_dim
         self.activation = activation
 
@@ -363,12 +362,13 @@ class EncoderBottomUp(nn.Module):
         e = self.activation(e)
         return e
 
+
 ########################################################################
 # INFERENCE NETWORK for z - q(z_l | z_{l+1}, c_l, h_l)
 class PosteriorZ(nn.Module):
     """
     Inference network q(z|h, z, c) gives approximate posterior over latent variables.
-    In this formulation there is no sharing of parameters between generative and inference model. 
+    In this formulation there is no sharing of parameters between generative and inference model.
 
     Attributes:
         batch_size: batch of datasets.
@@ -424,7 +424,7 @@ class PosteriorZ(nn.Module):
             z: moments for p(z_{l-1} | z_l, c).
             c: context latent representation for layer l.
         Returns:
-            moments for the approximate posterior over z 
+            moments for the approximate posterior over z
             at layer l.
         """
         # combine h, z, and c
@@ -462,12 +462,13 @@ class PosteriorZ(nn.Module):
         e = e.view(-1, 1, 2 * self.z_dim)
         e = self.bn_params(e)
         e = e.view(-1, 2 * self.z_dim)
-        
+
         mean, logvar = e.chunk(2, dim=1)
         return mean, logvar
 
 
 #######################################################################
+
 
 class PriorC(nn.Module):
     """
@@ -493,14 +494,14 @@ class PriorC(nn.Module):
         h_dim: int,
         activation: nn,
         mode: str = "mean",
-        ladder=False
+        ladder=False,
     ):
         super(PriorC, self).__init__()
 
         self.num_layers = num_layers
         self.hid_dim = hid_dim
         self.mode = mode
-        
+
         self.ladder = ladder
         self.k = 2
         if ladder:
@@ -530,7 +531,7 @@ class PriorC(nn.Module):
 
         Args:
             z: latent for samples at layer l+1.
-            rc: latent representations for context at layer l+1. 
+            rc: latent representations for context at layer l+1.
             (batch_size, sample_size, hid_dim)
 
         Returns:
@@ -573,9 +574,9 @@ class PriorC(nn.Module):
 
 class PosteriorC(nn.Module):
     """
-    Inference network q(c_l|c_{l+1}, z_{l+1}, H) 
+    Inference network q(c_l|c_{l+1}, z_{l+1}, H)
     gives approximate posterior over latent context.
-    In this formulation there is no sharing of 
+    In this formulation there is no sharing of
     parameters between generative and inference model.
 
     Attributes:
@@ -598,7 +599,7 @@ class PosteriorC(nn.Module):
         h_dim: int,
         activation: nn,
         mode: str = "mean",
-        ladder=False
+        ladder=False,
     ):
         super(PosteriorC, self).__init__()
 
@@ -631,7 +632,7 @@ class PosteriorC(nn.Module):
 
     def forward(self, h, z, c, bs, ns):
         """
-        Combine h, z, and c to parameterize the moments of the approximate 
+        Combine h, z, and c to parameterize the moments of the approximate
         posterior over c.
         Combine z and rc using the attention mechanism and aggregating.
         Embed z if we have more than one stochastic layer.
@@ -674,7 +675,7 @@ class PosteriorC(nn.Module):
             a = e.max(dim=1)[0]
 
         a = a.unsqueeze(1) + ec
-        
+
         # map to moments
         if self.ladder:
             mean, logvar, feats = self.postpool(a)
@@ -773,7 +774,7 @@ class ObservationDecoder(nn.Module):
             Moments of observation model.
         """
         # use z for all layers
-        #print(zs.size(), cs.size())
+        # print(zs.size(), cs.size())
         ezs = self.linear_zs(zs)
         ezs = ezs.view(bs, ns, -1)
 
@@ -800,7 +801,8 @@ class ObservationDecoder(nn.Module):
         # moments for the Bernoulli
         p = torch.sigmoid(e)
         return p
-        
+
+
 # class ObservationDecoderNew(nn.Module):
 #     """
 #     Parameterize (Bernoulli) observation model p(x | z, c).
@@ -843,7 +845,7 @@ class ObservationDecoder(nn.Module):
 #         self.activation = activation
 
 #         self.linear_zcs = nn.Linear(self.n_stochastic_z * self.c_dim, self.hid_dim)
-        
+
 #         self.linear_initial = nn.Linear(self.hid_dim, 256 * 4 * 4)
 
 #         self.conv_layers = nn.ModuleList(
@@ -889,10 +891,10 @@ class ObservationDecoder(nn.Module):
 #         cs_lst = [out["cqs"][i].unsqueeze(1) for i in range(self.n_stochastic_c)]
 #         cs = torch.cat(cs_lst, dim=1)
 #         cs = cs.repeat_interleave(repeats=ns, dim=0)
-        
+
 #         zs_lst = [out["zqs"][i].unsqueeze(1) for i in range(self.n_stochastic_z)]
 #         zs = torch.cat(zs_lst, dim=1)
-        
+
 #         # (bs*ns, l, h)
 #         e = zs + cs
 #         e = e.view(bs*ns, -1)
@@ -985,162 +987,3 @@ class RelationNetwork(nn.Module):
         # (b, q, dim)
         e = e.sum(2) / s
         return e
-
-
-if __name__ == "__main__":
-    import torch.distributions as td
-
-    def test_layers():
-        c_dim = 3
-        z_dim = 36
-        h_dim = 100
-
-        num_layers = 2
-        hid_dim = 128
-        batch_size = 10
-        sample_size = 5
-
-        bs = batch_size
-        ns = sample_size
-
-        n_stochastic_z = 3
-        n_stochastic_c = 3
-
-        activation = nn.ReLU()
-
-        statistics_network = StatisticNetwork(hid_dim, c_dim, h_dim, activation)
-
-        ladder_inference_network_z = LadderInferenceNetworkZ(
-            num_layers, hid_dim, c_dim, z_dim, h_dim, activation
-        )
-        latent_decoder_z = LatentDecoderZ(
-            num_layers, hid_dim, c_dim, z_dim, h_dim, activation
-        )
-
-        latent_decoder_c = LatentDecoderC(
-            num_layers, hid_dim, c_dim, z_dim, h_dim, activation
-        )
-        inference_network_c = InferenceNetworkC(
-            num_layers, hid_dim, c_dim, z_dim, h_dim, activation
-        )
-
-        observation_model = ObservationDecoder(
-            num_layers,
-            hid_dim,
-            c_dim,
-            z_dim,
-            h_dim,
-            n_stochastic_z,
-            n_stochastic_c,
-            activation,
-        )
-
-        h = torch.rand((batch_size, sample_size, hid_dim))
-        print("embedding data size: {}".format(h.size()))
-
-        # q(c_L | D)
-        mean, logvar, rcq = statistics_network.forward(h, bs, ns)
-        cd = td.Normal(mean, f_std(logvar))
-        c = cd.rsample()
-        print("summary size: {}".format(c.size()))
-
-        # p(z_l | z_{l+1}, c) where z_{l+1} = None
-        mean, logvar = latent_decoder_z.forward(None, c, bs, ns)
-        zd = td.Normal(mean, f_std(logvar))
-        z = zd.rsample()
-        print("prior: {}".format(z.size()))
-
-        # q(z_l | z_{l+1}, c, h) where z_{l+1} = None
-        print("deterministic bottom-up inference: {}".format(h.size()))
-        mean, logvar = ladder_inference_network_z.forward(h, None, c, bs, ns)
-        zd = td.Normal(mean, f_std(logvar))
-        z = zd.rsample()
-        print("stochastic top-down inference: {}".format(z.size()))
-
-        ################################# TEST p and q for context #################################
-        mean, logvar, _ = latent_decoder_c.forward(z, c, bs, ns)
-        print("mean pior over c: {}".format(mean.size()))
-        rcp = torch.cat([mean, logvar], -1)
-        mean, logvar, _ = inference_network_c.forward(h, z, rcp, bs, ns)
-        print("mean posterior over c: {}".format(mean.size()))
-
-        ################################ TEST ALL #################################################
-        Z = []
-        C = []
-
-        h = torch.rand((batch_size, sample_size, hid_dim))
-
-        # q(c_L | X)
-        mean, logvar, _ = statistics_network.forward(h, bs, ns)
-        cqd = td.Normal(mean, f_std(logvar))
-        cq = cqd.rsample()
-        C.append(cq)
-
-        # genrative model
-        # p(zp_L | c_L)
-        m, lv = latent_decoder_z.forward(None, cq, bs, ns)
-        zpd = td.Normal(m, f_std(lv))
-
-        # inference model
-        # q(zq_L | c_L, h)
-        # h = ladder_inference_network_z.forward_deterministic(
-        #     h, c, first=True, bs=bs, ns=ns)
-        mean, logvar = ladder_inference_network_z.forward(h, None, c, bs, ns)
-        zqd = td.Normal(mean, f_std(logvar))
-        zq = zqd.rsample()
-        Z.append(zq)
-
-        cs = cq
-        for l in range(2):
-            print("layer: ", l)
-
-            # p(cp_l | cp_{l+1}, zq_{l+1}})
-            mean, logvar, _ = latent_decoder_c.forward(zq, cq, bs=bs, ns=ns)
-            cpd = td.Normal(mean, f_std(logvar))
-            rcp = torch.cat([mean, logvar], -1)
-            # can you use the generative model also here zp?
-            # q(cq_l | cq_{l+1}, zq_{l+1})
-            cq, logvar, _, = inference_network_c.forward(h, zq, rcp, bs=bs, ns=ns)
-            C.append(cq)
-
-            # p(zp_l | zq_{l+1}, cq_l)
-            m, lv = latent_decoder_z.forward(zq, cq, bs=bs, ns=ns)
-            zpd = td.Normal(m, f_std(lv))
-            zp = torch.cat([m, lv])
-
-            # q(zq_l | zp_l, cq_l, h)
-            # h = ladder_inference_network_z.forward_deterministic(
-            #     h, cq, first=False, bs=bs, ns=ns)
-            mean, logvar = ladder_inference_network_z.forward(h, zp, cq, bs=bs, ns=ns)
-            zqd = td.Normal(mean, f_std(logvar))
-            zq = zqd.rsample()
-            Z.append(zq)
-
-        zs = torch.cat(Z, dim=-1)
-        zs = zs.view(bs, ns, -1)
-        cs = torch.cat(C, dim=-1)
-        cs = cs.view(bs, ns, -1)
-        p = observation_model.forward(zs, cs, bs, ns)
-
-        print(p.size())
-
-    def test_memory():
-        c_dim = 3
-        z_dim = 36
-        h_dim = 100
-
-        num_layers = 2
-        hid_dim = 32
-        batch_size = 10
-        sample_size_c = 5
-        sample_size_z = 2
-
-        n_stochastic = 3
-        memory = MemoryC(hid_dim, c_dim, z_dim)
-
-        k = torch.rand((batch_size, sample_size_c, h_dim))
-        v = torch.rand((batch_size, sample_size_c, h_dim))
-        q = torch.rand((batch_size, sample_size_z, h_dim))
-        out = memory(k, v, q)
-
-    test_layers()

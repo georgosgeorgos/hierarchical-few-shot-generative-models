@@ -3,11 +3,12 @@ import os
 import pickle
 import torch
 import random
-from torch.optim import SGD, Adam
+from torch.optim import SGD, Adam, AdamW
 from torch.optim.lr_scheduler import ReduceLROnPlateau, StepLR, ExponentialLR
 import numpy as np
 from torch.nn import functional as F
 import argparse
+from utils.parser import parse_args
 
 
 def set_seed(s=0):
@@ -58,6 +59,12 @@ def model_kwargs(args):
         "aggregation_mode": args.aggregation_mode,
         "ladder": args.ladder,
         "ll": args.likelihood,
+        "str_enc": args.str_enc,
+        "str_gen_z": args.str_gen_z,
+        "str_gen_c": args.str_gen_c,
+        "str_dec": args.str_dec,
+        "pixelcnn_mode": args.pixelcnn_mode,
+        "parallel_mode": args.parallel_mode,
     }
     return kwargs
 
@@ -125,12 +132,19 @@ def set_paths(args):
 
 def load_args(args):
     path = os.path.join(args.ckpt_dir, "cfg.pkl")
+    # load run specific args
     with open(path, "rb") as f:
         cfg = pickle.load(f)
 
-    parser = argparse.ArgumentParser()
-    args = parser.parse_args()
-    args.__dict__ = cfg["args"]
+    #parser = argparse.ArgumentParser()
+    # load standard arges
+    args = parse_args()
+    #args = parser.parse_args()
+    
+    # overwrite
+    for k in cfg["args"]:
+        args.__dict__[k] = cfg["args"][k]
+    #args.__dict__ = cfg["args"]
     return args
 
 
@@ -164,11 +178,11 @@ def select_optimizer(args, model):
         )
 
     elif args.optimizer == "adamw":
-        optimizer = Adam(
+        optimizer = AdamW(
             model.parameters(),
             weight_decay=args.weight_decay,
             lr=args.learning_rate,
-            betas=(args.adam_beta1, args.adam_beta2),
+            betas=(0.9, 0.9),
         )
 
     # scheduler
@@ -184,7 +198,7 @@ def select_optimizer(args, model):
         scheduler = ExponentialLR(optimizer, gamma=args.lr_step)
 
     elif args.scheduler == "step":
-        scheduler = StepLR(optimizer, step_size=50, gamma=args.lr_step)
+        scheduler = StepLR(optimizer, step_size=args.patience, gamma=args.lr_step)
 
     elif args.scheduler == "warmup":
         scheduler = torch.optim.lr_scheduler.LambdaLR(

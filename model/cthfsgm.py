@@ -8,8 +8,8 @@ from torch.nn import functional as F
 from torch.nn import init
 
 from model.chfsgm import CHFSGM
-from model.layer.tlayers_conv import (AttentivePosteriorC, AttentivePriorC, AttentiveStatistiC)
-
+from model.layer.tlayers_conv import AttentiveStatistiC, AttentivePosteriorC
+from model.layer.layers_conv import PriorC
 
 class CTHFSGM(CHFSGM):
     """
@@ -49,7 +49,7 @@ class CTHFSGM(CHFSGM):
         # initialize hierarchy for c
         for _ in range(self.n_stochastic - 1):
             posterior_c.append(AttentivePosteriorC(*c_args))
-            prior_c.append(AttentivePriorC(*c_args))
+            prior_c.append(PriorC(*c_args))
         
         self.posterior_c = nn.ModuleList(posterior_c)
         self.prior_c = nn.ModuleList(prior_c)

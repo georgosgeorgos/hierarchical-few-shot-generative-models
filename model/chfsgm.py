@@ -504,9 +504,9 @@ class CHFSGM(HFSGM):
             kl_c += (cqd[l].log_prob(cqs[l]) - cpd[l].log_prob(cqs[l])).sum(-1).sum(-1).sum(-1)
             kl_z += (zqd[l].log_prob(zqs[l]) - zpd[l].log_prob(zqs[l])).sum(-1).sum(-1).sum(-1)
 
-        logpx = logpx.view(bs, -1)  # .sum(-1) / ns
-        kl_z = kl_z.view(bs, -1)  # .sum(-1) / ns
-        kl_c = kl_c.view(bs, -1).repeat(1, ns) / ns
+        logpx = logpx.view(bs, -1).sum(-1)
+        kl_z = kl_z.view(bs, -1).sum(-1)
+        kl_c = kl_c.squeeze()
         
         kl = kl_c + kl_z
         # Variational lower bound and weighted loss

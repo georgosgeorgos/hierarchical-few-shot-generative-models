@@ -18,24 +18,24 @@ class CelebaSetsDataset(data.Dataset):
     """ 
     def __init__(self,
                  dataset="celeba",
-                 data_dir="./celebA/celeba/processed_celeba/",
+                 data_dir="/data/celeba",
                  sample_size=5,
                  num_classes_task=1,
                  split="train",
                  augment=False):
         super(CelebaSetsDataset, self).__init__()
 
-        self.dts = {"celeba": {"size": 64, "img_cls": [20, 30], "nc": 3, "tr": 4444, "vl": 635, "ts": 1270}}
-
-        with open("./celebA/celeba/map_celeba.pkl", "rb") as f:
+        with open("/data/celeba/map_celeba.pkl", "rb") as f:
             self.map_classes = pickle.load(f)
         self.data_dir = data_dir
-        self.data_dir = "./celebA/celeba/processed_celeba/"
+        self.data_dir = "/data/celeba/"
         self.sample_size = sample_size
         self.split = split
         self.mix = True
         self.size=64
         self.nc=3
+
+        self.dts = {"celeba": {"size": 64, "img_cls": [20, 30], "nc": 3, "tr": 4444, "vl": 635, "ts": 1270}}
         
         classes = sorted(self.map_classes.keys())
         
@@ -57,8 +57,6 @@ class CelebaSetsDataset(data.Dataset):
 
     def __getitem__(self, item, lbl=None):
         samples = self.make_set(item)
-        # if self.mix:
-        #     samples = samples * 2 - 1 
         return samples
 
     def __len__(self):
