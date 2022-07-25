@@ -130,3 +130,25 @@ A lot of code and ideas borrowed from:
 * https://github.com/vlievin/biva-pytorch
 * https://github.com/didriknielsen/survae_flows
 * https://github.com/openai/vdvae
+
+
+## Citations
+
+```bibtex
+@inproceedings{Giannone2022SCHAVAEHC,
+  title={SCHA-VAE: Hierarchical Context Aggregation for Few-Shot Generation},
+  author={Giorgio Giannone and Ole Winther},
+  booktitle={ICML},
+  year={2022}
+}
+```
+
+```bibtex
+@article{Giannone2021HierarchicalFG,
+  title={Hierarchical Few-Shot Generative Models},
+  author={Giorgio Giannone and Ole Winther},
+  journal={ArXiv},
+  year={2021},
+  volume={abs/2110.12279}
+}
+```
