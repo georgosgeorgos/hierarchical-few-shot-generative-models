@@ -1,10 +1,23 @@
-# Hierarchical Few-Shot Generative Models
+## Hierarchical Few-Shot Generative Models
 
-[Giorgio Giannone](https://georgosgeorgos.github.io/), [Ole Winther](https://olewinther.github.io/)
 
-This repo contains code and experiments for the paper `Hierarchical Few-Shot Generative Models`.
+This repo contains code and experiments for: 
 
-* Website: https://georgosgeorgos.github.io/hierarchical-few-shot-generative-models/
+> **SCHA-VAE: Hierarchical Context Aggregation for Few-Shot Generation** \
+> [Giorgio Giannone](https://georgosgeorgos.github.io/), [Ole Winther](https://olewinther.github.io/) \
+> ICML22
+
+* paper: https://arxiv.org/abs/2110.12279
+* [website](https://georgosgeorgos.github.io/hierarchical-few-shot-generative-models/)
+
+and
+
+> **Hierarchical Few-Shot Generative Models** \
+> Giorgio Giannone, Ole Winther \
+> MetaLearn21
+
+* paper: https://openreview.net/forum?id=INSai0E0VXN
+* [website](https://georgosgeorgos.github.io/hierarchical-few-shot-generative-models/)
 
 -------
 ## Settings
