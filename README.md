@@ -3,9 +3,23 @@
 *A few-shot generative model should be able to generate data from a novel distribution by only observing a limited set of examples. In few-shot learning the model is trained on data from many sets from distributions sharing some underlying properties such as sets of characters from different alphabets or objects from different categories. We extend current latent variable models for sets to a fully hierarchical approach with an attention-based point to set-level aggregation and call our method SCHA-VAE for Set-Context-Hierarchical-Aggregation Variational Autoencoder. We explore likelihood-based model comparison, iterative data sampling, and adaptation-free out-of-distribution generalization. Our results show that the hierarchical formulation better captures the intrinsic variability within the sets in the small data regime. This work generalizes deep latent variable approaches to few-shot learning, taking a step toward large-scale few-shot generation with a formulation that readily works with current state-of-the-art deep generative models*.
 
 <p align="center">
-<img src="https://github.com/georgosgeorgos/hierarchical-few-shot-generative-models/blob/main/assets/ns_gm.png" width="400px" alt="teaser"> 
-&nbsp &nbsp &nbsp
-<img src="https://github.com/georgosgeorgos/hierarchical-few-shot-generative-models/blob/main/assets/hfsgm_gm_white.png" width="400px" alt="teaser">
+  <img src="https://github.com/georgosgeorgos/hierarchical-few-shot-generative-models/blob/main/assets/scha-vae.png" width="400px" alt="teaser"> 
+  &nbsp&nbsp&nbsp
+  <img src="https://github.com/georgosgeorgos/hierarchical-few-shot-generative-models/blob/main/assets/vlb_set_size_omni.png" width="400px" alt="teaser">
+</p>
+
+<p align="center">
+  <img src="https://github.com/georgosgeorgos/hierarchical-few-shot-generative-models/blob/main/assets/ns_gm.png" width="400px" alt="teaser"> 
+  &nbsp&nbsp&nbsp
+  <img src="https://github.com/georgosgeorgos/hierarchical-few-shot-generative-models/blob/main/assets/hfsgm_gm_white.png" width="400px" alt="teaser">
+</p>
+
+<p align="center">
+<img src="https://github.com/georgosgeorgos/hierarchical-few-shot-generative-models/blob/main/assets/sampling-celeba.png" width="800px" alt="teaser"> 
+</p>
+
+<p align="center">
+<img src="https://github.com/georgosgeorgos/hierarchical-few-shot-generative-models/blob/main/assets/sampling-refine.png" width="800px" alt="teaser">
 </p>
 
 This repo contains code and experiments for: 
