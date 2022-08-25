@@ -8,8 +8,7 @@ This repo contains code and experiments for:
 > [Giorgio Giannone](https://georgosgeorgos.github.io/), [Ole Winther](https://olewinther.github.io/) \
 > ICML 2022
 
-* paper: https://proceedings.mlr.press/v162/giannone22a.html
-* [page](https://georgosgeorgos.github.io/hierarchical-few-shot-generative-models/)
+[[paper](https://proceedings.mlr.press/v162/giannone22a.html)] [[project page](https://georgosgeorgos.github.io/hierarchical-few-shot-generative-models/)]
 
 and
 
@@ -17,8 +16,7 @@ and
 > Giorgio Giannone, Ole Winther \
 > MetaLearn21
 
-* paper: https://openreview.net/forum?id=INSai0E0VXN
-* [page](https://georgosgeorgos.github.io/hierarchical-few-shot-generative-models/)
+[[paper](https://openreview.net/forum?id=INSai0E0VXN)] [[project page](https://georgosgeorgos.github.io/hierarchical-few-shot-generative-models/)]
 
 -------
 ## Settings
