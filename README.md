@@ -1,14 +1,15 @@
-## Hierarchical Few-Shot Generative Models
+## Hierarchical Context Aggregation for Few-Shot Generation
 
+A few-shot generative model should be able to generate data from a novel distribution by only observing a limited set of examples. In few-shot learning the model is trained on data from many sets from distributions sharing some underlying properties such as sets of characters from different alphabets or objects from different categories. We extend current latent variable models for sets to a fully hierarchical approach with an attention-based point to set-level aggregation and call our method SCHA-VAE for Set-Context-Hierarchical-Aggregation Variational Autoencoder. We explore likelihood-based model comparison, iterative data sampling, and adaptation-free out-of-distribution generalization. Our results show that the hierarchical formulation better captures the intrinsic variability within the sets in the small data regime. This work generalizes deep latent variable approaches to few-shot learning, taking a step toward large-scale few-shot generation with a formulation that readily works with current state-of-the-art deep generative models.
 
 This repo contains code and experiments for: 
 
 > **SCHA-VAE: Hierarchical Context Aggregation for Few-Shot Generation** \
 > [Giorgio Giannone](https://georgosgeorgos.github.io/), [Ole Winther](https://olewinther.github.io/) \
-> ICML22
+> ICML 2022
 
-* paper: https://arxiv.org/abs/2110.12279
-* [website](https://georgosgeorgos.github.io/hierarchical-few-shot-generative-models/)
+* paper: https://proceedings.mlr.press/v162/giannone22a.html
+* [page](https://georgosgeorgos.github.io/hierarchical-few-shot-generative-models/)
 
 and
 
@@ -17,7 +18,7 @@ and
 > MetaLearn21
 
 * paper: https://openreview.net/forum?id=INSai0E0VXN
-* [website](https://georgosgeorgos.github.io/hierarchical-few-shot-generative-models/)
+* [page](https://georgosgeorgos.github.io/hierarchical-few-shot-generative-models/)
 
 -------
 ## Settings
